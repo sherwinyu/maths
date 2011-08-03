@@ -1,0 +1,25 @@
+<html>
+	<head>
+		<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js"></script>
+		<script type=>
+			function winkles()
+			{
+				$.get("submitAnswer/ajax", function(data) { alert(data); });
+			}
+		</script>
+	</head>
+
+	<body>
+		<div class="game_area">
+			<form action="submitAnswer/ajax" method="post">
+				{{ form.as_table }}
+				<input type="submit" value="Submit the form">
+			</form>
+		</div>
+		<div class="test">
+			<form action="" method="get">
+				<input type="button" onClick="winkles()">
+			</form>
+		</div>
+	</body>
+</html>
