@@ -70,14 +70,13 @@ def testStack():
         while(q!="TIMEOUT"):
             if q!="WRONG":
                 print q
-            a = int(raw_input())
+            a = random.randint(1, 10**(i+1)*2)
             q = sess.answer(a)
         print "Your score for this level: %d" % sess.levelScore
         sess.endLevel()
     print "Your total score: %d" % sess.totalScore
     endSession(id)
     
-testStack()
     
     
     

@@ -6,7 +6,9 @@ from maths.views import *
 # admin.autodiscover()
 
 urlpatterns = patterns('',
-	url(r'^hello/$', hello_world),
+	url(r'^hello/(?P<value>\w+)/$', hello_world),
+	url(r'^store/(?P<value>\w+)/$', store) 
+	
     # Examples:
     # url(r'^$', 'maths.views.home', name='home'),
     # url(r'^maths2/', include('maths2.foo.urls')),
