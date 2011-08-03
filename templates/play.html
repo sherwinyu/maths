@@ -1,19 +1,26 @@
 <html>
 	<head>
 		<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js" type="text/javascript"></script>
-		<script src="/play.js" type="text/javascript">
-			
+		<script> 
+			sessionID = {{ sessID }};
 		</script>
+		<script src="/static/play.js" type="text/javascript"></script>
+			
+		
 	</head>
 
 	<body>
-		<div id="question">{{ question }}</div>
+		<input id="nextLevelButton" type="button" value="Next Level"/> <br>
+		<br> 
 		
-		<div class="game_area">
-			{{ form.as_table }}
-		</div>
+		<div id="questionField">Welcome to MATHS!</div>
+		{{ form.as_table }}
+		<div id="answerFeedbackField"> <br> </div>
+		<br>
 		
-		<div id="timer"/>
-		<div id="score"/>
+		<div id="levelField"> Level: 1</div>
+		<div id="timerField"> Timer: 0</div>
+		<div id="scoreField"> Score: 0</div>
+		<div id="totalScoreField"> Total: 0</div>
 	</body>
 </html>

@@ -3,7 +3,8 @@ import time
 
 mathsSessionCounter = 0
 mathsSessions = {}
-levelTimeLimit = (-1,5,5,5,5,5)
+levelTimeLimit = (-1,5,5,5,10,10)
+totalNumLevels = 5
 
 class MathsSession:
     def __init__(self, id):
@@ -27,10 +28,13 @@ class MathsSession:
         return question
     
     def answer(self, answer):
-        if self.levelStart+levelTimeLimit[self.level]<time.time():
-            return "TIMEOUT"
         if self.nextAnswer==None:
             return "NO_QUESTION"
+        if self.levelStart+levelTimeLimit[self.level]<time.time():
+            gameOver = self.endLevel()
+            return "GAME_OVER" if gameOver else "LEVEL_OVER"
+        if answer==None:
+            return "INVALID_ANSWER"
         if answer==self.nextAnswer:
             self.levelScore+=1
             return self.nextQuestion()
@@ -42,6 +46,10 @@ class MathsSession:
         self.totalScore+=self.levelScore
         self.levelStart = None
         self.nextAnswer = None
+        gameOver = False
+        if(self.level==totalNumLevels):
+            gameOver = True
+        return gameOver
 
 def startSession():
     global mathsSessionCounter
