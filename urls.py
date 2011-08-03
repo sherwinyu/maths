@@ -8,15 +8,8 @@ from forms import AnswerForm
 # admin.autodiscover()
 
 urlpatterns = patterns('',
-	url(r'^hello/$', hello_world),
-	url(r'^search-form/$', search),
-	url(r'^search/$', search),
-	url(r'^contact/$', contact),
-	url(r'^xhr_test/$', xhr_test),
-	url(r'^ajax_test/$', direct_to_template, {'template': 'ajax_test.html'}),
-	url(r'^play/submitAnswer/ajax/?$', submitAnswer),
-	url(r'^play/submitAnswer/?$', submitAnswer),
-	url(r'^play/$', direct_to_template, {'template': 'play.html', 'extra_context': {'form': AnswerForm() } }),
+	url(r'^play/submitAnswer/ajax$', submitAnswer),
+	url(r'^play/$', newSession),
 
     # Examples:
     # url(r'^$', 'maths.views.home', name='home'),
