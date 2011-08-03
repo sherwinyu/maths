@@ -76,9 +76,3 @@ def testStack():
         sess.endLevel()
     print "Your total score: %d" % sess.totalScore
     endSession(id)
-    
-    
-    
-    
-    
-    
