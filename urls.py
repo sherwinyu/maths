@@ -8,10 +8,14 @@ from forms import AnswerForm
 # admin.autodiscover()
 
 urlpatterns = patterns('',
-	url(r'^play/submitAnswer$', submitAnswer),
-	url(r'^play/newLevel$', newLevel),
-	url(r'^play/$', newSession),
-	
+    url(r'^play/submitAnswer$', submitAnswer),
+    # url(r'^play/newLevel$', newLevel),
+    url(r'^play/playerReady$', playerReady),
+    url(r'^play/pollNextQuestion$', pollNextQuestion),
+    url(r'^play/pollNextLevel$', pollNextLevel),
+    url(r'^play/$', newSession),
+    url(r'^test/$', test),
+    
 
     # Examples:
     # url(r'^$', 'maths.views.home', name='home'),
