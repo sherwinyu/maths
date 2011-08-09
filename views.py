@@ -13,7 +13,7 @@ def submitAnswer(request):
     if(id==-1):
         return redirect('/play')
     sess = mathsSessions[id]
-    resp = sess.answer(ans)
+    resp = sess.checkAnswer(ans)
     if(resp=="WRONG"):
         resp+=","+str(ans)
     elif(resp=="LEVEL_OVER"):
@@ -22,90 +22,53 @@ def submitAnswer(request):
         resp+=","+str(sess.levelScore)+","+str(sess.totalScore)
     elif resp=="CORRECT":
         mathsGame.computeNextQuestion()
-        for session in mathsGame.sessions:
-            session.waitingForQuestion = True
+        for sessionID in mathsGame.sessions:
+            mathsSessions[sessionID].waitingForQuestion = True
     return HttpResponse(resp)
 
 def newSession(request):
     sessionID = startSession()
-    print "sessionID", sessionID
     return render_to_response('play.html', {'form': AnswerForm, 'sessionID': sessionID} )
 
-def newLevel(request):
+def playerReady(request):
+    if not request.is_ajax() or request.method != 'POST':
+        return redirect('/play')
+    try:
+        id = int(request.POST.get('sessionID', -1))
+    except:
+        id = -1 
+    if id == -1:
+        return redirect('/play')
+    sess = mathsSessions[id]
+    sess.ready = True
+    if mathsGame.isNextLevelReady():
+        mathsGame.nextLevel()
+    return HttpResponse('success!thisisnnotparsed')
+
+def pollNextLevel(request):
     if not request.is_ajax() or request.method != 'POST':
         return redirect('/play')
     try: id = int(request.POST.get('sessionID', -1))
     except: id = -1
     if id == -1:
         return redirect('/play')
-    sess = mathsSessions[id]
-    q = sess.nextLevel()
-    time = levelTimeLimit[sess.level]
-    return HttpResponse(",".join(map(str,(sess.level,time,q))))
+    if not mathsGame.playing:
+        return HttpResponse('FAIL') # TODO json this shit
+    html = "SUCCESS,%d,%d" % (mathsGame.level, levelTimeLimit[mathsGame.level] )
+    return HttpResponse(html) 
 
-def playerReady(request):
-    """
-    called when user clicks next level
-    sets sess.ready to true for the session of the current id
-    binds session to game
-    """
-    print "in Player Ready"
-    # if not request.is_ajax() or request.method != 'POST':
-        # return redirect('/play')
-    try:
-        id = int(request.POST.get('sessionID', -1))
-        print id
-    except:
-        id = -1
-    if id == -1:
+def pollNextQuestion(request):
+    if not request.is_ajax() or request.method != 'POST':
         return redirect('/play')
-    sess = mathsSessions[id]
-    sess.ready = True
-    print "sess=", sess
-    print "mG.s=", mathsGame.sessions
-    mathsGame.sessions.append(sess)
-    print "sess=", sess
-    print "mG.s=", mathsGame.sessions
-    return HttpResponse('success!thisisnnotparsed')
-
-def pollNextLevel(request):
-    print "pollNextlevel"
-    if not request.is_ajax() or request.method != 'GET':
-        return redirect('/play')
-    try: id = int(request.GET.get('sessionID', -1))
+    try: id = int(request.POST.get('sessionID', -1))
     except: id = -1
     if id == -1:
         return redirect('/play')
-    if not mathsGame.isNextLevelReady():
-        return HttpResponse('FAIL') # TODO json this shit
-    mathsGame.sessions[id].waitingForQuestion = True
-    html = "SUCCESS,%d,%d" % (mathsGame.level, levelTimeLimit[mathsGame.level] )
+    if not mathsSessions[id].waitingForQuestion:
+        return HttpResponse('FAIL')
+    
+    mathsSessions[id].waitingForQuestion = False
+    html = 'SUCCESS,'+mathsGame.nextQuestion
     return HttpResponse(html)
-
-def pollNextQuestion(request):
-    try:
-        if not request.is_ajax() or request.method != 'GET':
-            return redirect('/play')
-        try: id = int(request.GET.get('sessionID', -1))
-        except: id = -1
-        if id == -1:
-            return redirect('/play')
-        if not mathsGame.sessions[id].waitingForQuestion:
-            return HttpResponse('FAIL')
-        mathsGame.sessions[id].waitingForQuestion = False
-        html = 'SUCCESS,%s' % mathsGame.nextQuestion
-        return HttpResponse(html)
-    except Exception as error:
-        print error
-        return HttpResponse(error)
-
-def test(request):
-    try:
-        asdf
-    except Exception as e:
-        print e
-        return HttpResponse(e)
-    print "else"
-
 
 

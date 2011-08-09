@@ -19,8 +19,14 @@ $(document).ready(function() {
 	function submitAnswerCallback(argcsv) {
 		args = argcsv.split(",");
 		if(args[0]=="LEVEL_OVER") {
+			if(levelScore!=args[1]) {
+				alert("Scoreboard desync!");
+			}
 			endLevel();
 		} else if(args[0]=="GAME_OVER") {
+			if(levelScore!=args[1] || totalScore!=args[2]) {
+				alert("Scoreboard desync!");
+			}
 			endLevel();
 			endGame();
 		} else if (args[0]=="WRONG") {
@@ -29,10 +35,9 @@ $(document).ready(function() {
 		} else if (args[0]=="INVALID_ANSWER") {
 			$("#answerFeedbackField").text("Invalid answer.");
 		} else if (args[0]=="NO_QUESTION") {
-		} else {
+		} else if (args[0]=="CORRECT") {
 			$("#answerFeedbackField").text("Correct.");
 			addScore(1);
-			$("#questionField").text(args[0]);
 		}
 	}
 
@@ -50,7 +55,7 @@ $(document).ready(function() {
 		pollNextLevelInterval = setInterval(
 											function() {
 												$.ajax({
-													type: 'GET',
+													type: 'POST',
 													url: 'pollNextLevel',
 													//success: function(a) { console.log(a) },//console.log(''),//pollNextLevelCallback,
 													success: pollNextLevelCallback,
@@ -58,7 +63,7 @@ $(document).ready(function() {
 												});
 												dbg("polling next level");
 											}
-											, 500
+											, 50
 											);
 	}
 
@@ -72,10 +77,10 @@ $(document).ready(function() {
 		request_status = args[0];
 		if (request_status == 'FAIL')
 			return;
-		//debug(
 		clearInterval(pollNextLevelInterval); // disable the polling for next level if the level starts
 		curLevel = args[1];
 		curLevelTime = args[2];
+		dbg("set time to: "+curLevelTime);
 		curLevelScore = 0;
 
 		$("#levelField").text("Level: " + curLevel);
@@ -86,27 +91,27 @@ $(document).ready(function() {
 		updateTimerInterval = setInterval(function() {
 									curLevelTime -= 1;
 									$("#timerField").text("Timer: "+curLevelTime);
+									if (curLevelTime <= 0) {
+										clearInterval(pollNextQuestionInterval);
+										clearInterval(updateTimerInterval);
+										$('#id_answer').val('');
+										submitAnswer(); //TODO check this
+									}
 								}, 1000);
 		pollNextQuestion(); // start polling for questions
 	}
 	function pollNextQuestion() {
 		pollNextQuestionInterval = setInterval(function() {
 										$.ajax( {
-											type: 'GET',
+											type: 'POST',
 											url: 'pollNextQuestion',
 											success: pollNextQuestionCallback,
-											//success: function(a) {console.log(a)},//console.log("",a)},
 											data: {sessionID: sessionID}
 										});
-									}, 500);
+										
+									}, 50);
 
-		//TODO refactor to end level method::
-		if (curLevelTime <= 0) {
-			clearInterval(pollNextQuestionInterval);
-			clearInterval(updateTimerInterval);
-			$('#id_answer').val('');
-			submitAnswer(); //TODO check this
-		}
+		
 	}
 	function pollNextQuestionCallback(argscsv) {
 	// if 'FAIL' (the next question is not ready) --> do nothing
@@ -120,7 +125,6 @@ $(document).ready(function() {
 			curQuestion = args[1];
 			dbg("curQuestion= " + curQuestion);
 			$("#questionField").text("Question:" + curQuestion);
-			addScore(1);
 		}
 	}
 
@@ -131,11 +135,9 @@ $(document).ready(function() {
 		$("#totalScoreField").text("Total: "+totalScore);
 	}
 	function endLevel() {
-		if(levelScore!=args[1]) {
-			alert("Scoreboard desync!");
-		}
 		$("#questionField").text("Level "+curLevel+" over");
 		$('#id_answer').attr("disabled", true);
+		$("#nextLevelButton").removeAttr('disabled');
 	}
 	function endGame() {
 		$("#questionField").text("Game over");

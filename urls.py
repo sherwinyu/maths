@@ -9,12 +9,10 @@ from forms import AnswerForm
 
 urlpatterns = patterns('',
     url(r'^play/submitAnswer$', submitAnswer),
-    # url(r'^play/newLevel$', newLevel),
     url(r'^play/playerReady$', playerReady),
     url(r'^play/pollNextQuestion$', pollNextQuestion),
     url(r'^play/pollNextLevel$', pollNextLevel),
     url(r'^play/$', newSession),
-    url(r'^test/$', test),
     
 
     # Examples:
