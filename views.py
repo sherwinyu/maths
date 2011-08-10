@@ -38,7 +38,7 @@ def playerReady(request):
     try:
         id = int(request.POST.get('sessionID', -1))
     except:
-        id = -1 
+        id = -1
     if id == -1:
         return redirect('/play')
     
@@ -56,7 +56,7 @@ def pollNextLevel(request):
     except: id = -1
     if id == -1:
         return redirect('/play')
-    
+   
     session = mathsSessions[id]
     game = mathsGames[session.gameID]
     if not game.playing:
