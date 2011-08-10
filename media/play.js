@@ -114,13 +114,15 @@ $(document).ready(function() {
 		$("#totalScoreField").text("Total: "+glTotalScore);
 	}
 	function endLevel() {
+		clearInterval(pollNextQuestionInterval);
+		clearInterval(updateTimerInterval);
 		$("#questionField").text("Level "+glCurLevel+" over");
 		$('#id_answer').attr("disabled", true);
 		$("#nextLevelButton").removeAttr('disabled');
 	}
-	function setupLevel(lvl, lvlTime)
+	function setupLevel(level, lvlTime)
 	{
-		glCurLevel = lvl
+		glCurLevel = level
 		glTimeLeftInLevel = lvlTime
 		glLevelScore = 0;
 		dbg("set time to: "+glTimeLeftInLevel);
@@ -137,8 +139,6 @@ $(document).ready(function() {
 									glTimeLeftInLevel -= 1;
 									$("#timerField").text("Timer: "+glTimeLeftInLevel);
 									if (glTimeLeftInLevel <= 0) {
-										clearInterval(pollNextQuestionInterval);
-										clearInterval(updateTimerInterval);
 										$('#id_answer').val('');
 										submitAnswer();
 									}

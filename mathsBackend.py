@@ -36,7 +36,7 @@ class MathsGame:
         self.levelStart = None
         self.nextQuestion = None
         self.nextAnswer = None
-        for i in self.sessionIDs:
+        for i in self.sessionIDs: 
             mathsSessions[i].endLevel()
     
     def computeNextQuestion(self):
