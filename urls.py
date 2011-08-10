@@ -13,7 +13,6 @@ urlpatterns = patterns('',
     url(r'^play/pollNextQuestion$', pollNextQuestion),
     url(r'^play/pollNextLevel$', pollNextLevel),
     url(r'^play/$', newSession),
-    
 
     # Examples:
     # url(r'^$', 'maths.views.home', name='home'),
