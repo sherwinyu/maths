@@ -12,14 +12,14 @@ def submitAnswer(request):
     except: id = -1
     if(id==-1):
         return redirect('/play')
-    sess = mathsSessions[id]
-    resp = sess.checkAnswer(ans)
+    session = mathsSessions[id]
+    resp = session.checkAnswer(ans)
     if(resp=="WRONG"):
         resp+=","+str(ans)
     elif(resp=="LEVEL_OVER"): 
-        resp+=","+str(sess.levelScore)
+        resp+=","+str(session.levelScore)
     elif resp=="GAME_OVER":
-        resp+=","+str(sess.levelScore)+","+str(sess.totalScore)
+        resp+=","+str(session.levelScore)+","+str(session.totalScore)
     elif resp=="CORRECT":
         mathsGame.computeNextQuestion()
         for sessionID in mathsGame.sessions:
@@ -36,7 +36,7 @@ def playerReady(request):
     try:
         id = int(request.POST.get('sessionID', -1))
     except:
-        id = -1 
+        id = -1
     if id == -1:
         return redirect('/play')
     sess = mathsSessions[id]
@@ -55,7 +55,7 @@ def pollNextLevel(request):
     if not mathsGame.playing:
         return HttpResponse('FAIL') # TODO json this shit
     html = "SUCCESS,%d,%d" % (mathsGame.level, levelTimeLimit[mathsGame.level] )
-    return HttpResponse(html) 
+    return HttpResponse(html)
 
 def pollNextQuestion(request):
     if not request.is_ajax() or request.method != 'POST':

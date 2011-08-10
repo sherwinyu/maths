@@ -1,8 +1,9 @@
 $(document).ready(function() {
-	curLevel = 0;
-	timeLeftInLevel = 0;
-	levelScore = 0;
-	totalScore = 0;
+	glCurLevel = 0;
+	glTimeLeftInLevel = 0;
+	glLevelScore = 0;
+	glTotalScore = 0;
+	glCurQuestion = '';
 	$('#id_answer').attr("disabled", true);
 
 	function submitAnswer() {
@@ -19,12 +20,12 @@ $(document).ready(function() {
 	function submitAnswerCallback(argcsv) {
 		args = argcsv.split(",");
 		if(args[0]=="LEVEL_OVER") {
-			if(levelScore!=args[1]) {
+			if(glLevelScore!=args[1]) {
 				alert("Scoreboard desync!");
 			}
 			endLevel();
 		} else if(args[0]=="GAME_OVER") {
-			if(levelScore!=args[1] || totalScore!=args[2]) {
+			if(glLevelScore!=args[1] || glTotalScore!=args[2]) {
 				alert("Scoreboard desync!");
 			}
 			endLevel();
@@ -66,8 +67,6 @@ $(document).ready(function() {
 											);
 	}
 
-	/*
-	*/
 	function pollNextLevelCallback(argcsv) {
 	// if 'FAIL' --> do nothing
 	// if 'SUCCESS' --> levelfield,
@@ -76,28 +75,7 @@ $(document).ready(function() {
 		request_status = args[0];
 		if (request_status == 'FAIL')
 			return;
-		clearInterval(pollNextLevelInterval); // disable the polling for next level if the level starts
-		curLevel = args[1];
-		timeLeftInLevel = args[2];
-		dbg("set time to: "+timeLeftInLevel);
-		levelScore = 0;
-		console.log(levelScore);
-
-		$("#levelField").text("Level: " + curLevel);
-		$("#timerField").text("Timer: " + timeLeftInLevel);
-		$('#id_answer').removeAttr("disabled");
-		$("#scoreField").text("Score: "+levelScore);
-		// start timer countdown for next level
-		updateTimerInterval = setInterval(function() {
-									timeLeftInLevel -= 1;
-									$("#timerField").text("Timer: "+timeLeftInLevel);
-									if (timeLeftInLevel <= 0) {
-										clearInterval(pollNextQuestionInterval);
-										clearInterval(updateTimerInterval);
-										$('#id_answer').val('');
-										submitAnswer();
-									}
-								}, 1000);
+		setupLevel(args[1], args[2])
 		pollNextQuestion(); // start polling for questions
 	}
 	function pollNextQuestion() {
@@ -108,44 +86,70 @@ $(document).ready(function() {
 											success: pollNextQuestionCallback,
 											data: {sessionID: sessionID}
 										});
-										
 									}, 50);
 
-		
 	}
 	function pollNextQuestionCallback(argscsv) {
 	// if 'FAIL' (the next question is not ready) --> do nothing
 	// if 'SUCCESS' --> update the text for next question; update score
 		args = argscsv.split(",");
 		request_status = args[0];
-		if (request_status == 'FAIL')
-			dbg("pollNextQuestionCallback FAIL");
-		else {
-			curQuestion = args[1];
-			dbg("curQuestion= " + curQuestion);
+		if (request_status == 'FAIL') {
+			dbg("pollNextQuestionCallback:FAIL");
+			return;
+		}
+		else if (request_status == 'SUCCESS') {
+			glCurQuestion = args[1];
+			dbg("glCurQuestion=" + glCurQuestion);
 			$('#id_answer').val('')
-			$("#questionField").text(""+curQuestion);
+			$("#questionField").text(""+glCurQuestion);
 		}
 	}
 
 	function addScore(d) {
-		levelScore += d;
-		totalScore += d;
-		$("#scoreField").text("Score: "+levelScore);
-		$("#totalScoreField").text("Total: "+totalScore);
+		glLevelScore += d;
+		glTotalScore += d;
+		$("#scoreField").text("Score: "+glLevelScore);
+		$("#glTotalScoreField").text("Total: "+glTotalScore);
 	}
 	function endLevel() {
-		$("#questionField").text("Level "+curLevel+" over");
+		$("#questionField").text("Level "+glCurLevel+" over");
 		$('#id_answer').attr("disabled", true);
 		$("#nextLevelButton").removeAttr('disabled');
+	}
+	function setupLevel(lvl, lvlTime)
+	{
+		glCurLevel = lvl
+		glTimeLeftInLevel = lvlTime
+		glLevelScore = 0;
+		dbg("set time to: "+glTimeLeftInLevel);
+		clearInterval(pollNextLevelInterval); // disable the polling for next level if the level starts
+
+		// update UI elements
+		$("#levelField").text("Level: " + glCurLevel);
+		$("#timerField").text("Timer: " + glTimeLeftInLevel);
+		$('#id_answer').removeAttr("disabled");
+		$("#scoreField").text("Score: "+glLevelScore);
+
+		// start timer countdown for next level
+		updateTimerInterval = setInterval(function() {
+									glTimeLeftInLevel -= 1;
+									$("#timerField").text("Timer: "+glTimeLeftInLevel);
+									if (glTimeLeftInLevel <= 0) {
+										clearInterval(pollNextQuestionInterval);
+										clearInterval(updateTimerInterval);
+										$('#id_answer').val('');
+										submitAnswer();
+									}
+								}, 1000);
 	}
 	function endGame() {
 		$("#questionField").text("Game over");
 		$('#nextLevelButton').attr("disabled", true);
 	}
 	function dbg(str) {
-		txt = $("#debug").text();
-		//$("#debug").text(str+"\n"+txt);
+		txt = $("#debug").html();
+		$("#debug").html(str+'<br>'+txt);
 	}
 
 
@@ -154,7 +158,7 @@ $(document).ready(function() {
 	$("#id_answer").keydown(function(event) {
 		if (event.keyCode == 13 || event.keyCode == 32) {
 			submitAnswer();
-		} 
+		}
 	});
 	$("#nextLevelButton").click(function(event) {
 		playerReady();
