@@ -111,7 +111,7 @@ $(document).ready(function() {
 		glLevelScore += d;
 		glTotalScore += d;
 		$("#scoreField").text("Score: "+glLevelScore);
-		$("#glTotalScoreField").text("Total: "+glTotalScore);
+		$("#totalScoreField").text("Total: "+glTotalScore);
 	}
 	function endLevel() {
 		$("#questionField").text("Level "+glCurLevel+" over");

@@ -23,7 +23,7 @@ def submitAnswer(request):
         resp += "," + str(session.levelScore) + "," + str(session.totalScore)
     elif resp == "CORRECT":
         game.computeNextQuestion()
-        for sessionID in game.sessions:
+        for sessionID in game.sessionIDs:
             mathsSessions[sessionID].waitingForQuestion = True
     return HttpResponse(resp)
 

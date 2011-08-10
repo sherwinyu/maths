@@ -3,8 +3,9 @@ import time
 
 mathsSessionCounter = 0
 mathsSessions = {}
+mathsGameCounter = 0
 mathsGames = {}
-levelTimeLimit = (-1,5,5,5,10,10)
+levelTimeLimit = (-1,15,15,20,30,30)
 totalNumLevels = 5
 
 class MathsGame:
@@ -50,12 +51,15 @@ class MathsGame:
         return True
 
     def createProblem(self, level, difficulty):
-        max = 10**level
+        max = 10**(level/2+1)
         a = random.randint(1,max)
         b = random.randint(1,max)
-        c = a+b
-        return ('%d + %d = ?' % (a,b), c)
-
+        if level%2 == 0:
+            c = a+b
+            return ('%d + %d = ?' % (a,b), c)
+        else:
+            c = a*b
+            return ('%d * %d = ?' % (a,b), c)
 
 class MathsSession:
     def __init__(self, id, gameID):
@@ -104,11 +108,13 @@ class MathsSession:
 
 def startSession():
     global mathsSessionCounter
+    global mathsGameCounter
     id = mathsSessionCounter
     mathsSessionCounter+=1
     gameID = id/2
     if not gameID in mathsGames:
         mathsGames[gameID] = MathsGame(gameID)
+        mathsGameCounter+=1
     mathsSessions[id] = MathsSession(id, gameID)
     mathsGames[gameID].addSession(id)
     return id
