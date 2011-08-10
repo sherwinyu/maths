@@ -95,7 +95,7 @@ $(document).ready(function() {
 										clearInterval(pollNextQuestionInterval);
 										clearInterval(updateTimerInterval);
 										$('#id_answer').val('');
-										submitAnswer(); //TODO check this
+										submitAnswer();
 									}
 								}, 1000);
 		pollNextQuestion(); // start polling for questions
@@ -124,7 +124,7 @@ $(document).ready(function() {
 			curQuestion = args[1];
 			dbg("curQuestion= " + curQuestion);
 			$('#id_answer').val('')
-			$("#questionField").text("Question:" + curQuestion);
+			$("#questionField").text(""+curQuestion);
 		}
 	}
 
