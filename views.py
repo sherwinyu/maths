@@ -25,7 +25,7 @@ def submitAnswer(request):
     elif resp=="CORRECT":
         game.computeNextQuestion()
         for sessionID in game.sessions:
-            session.waitingForQuestion = True
+            mathsSessions[sessionID].waitingForQuestion = True
     return HttpResponse(resp)
 
 def newSession(request):
