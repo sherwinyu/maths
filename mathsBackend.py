@@ -3,7 +3,7 @@ import time
 
 mathsSessionCounter = 0
 mathsSessions = {}
-levelTimeLimit = (-1,15,5,5,10,10)
+levelTimeLimit = (-1,5,5,5,10,10)
 totalNumLevels = 5
 
 class MathsGame:
@@ -22,7 +22,7 @@ class MathsGame:
         self.sessions.append(sessionID)
         
     def nextLevel(self):
-        self.level+=1
+        self.level+=1 
         self.levelStart = time.time()
         for i in self.sessions:
             mathsSessions[i].nextLevel()
@@ -70,7 +70,7 @@ class MathsSession:
 
     def nextLevel(self):
         self.levelScore = 0 
-        self.waitingForQuestion = True
+        self.waitingForQuestion = True 
 
     # Checks if the answer is correct.
     # If there is no question, returns no_question

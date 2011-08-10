@@ -16,7 +16,7 @@ def submitAnswer(request):
     resp = sess.checkAnswer(ans)
     if(resp=="WRONG"):
         resp+=","+str(ans)
-    elif(resp=="LEVEL_OVER"):
+    elif(resp=="LEVEL_OVER"): 
         resp+=","+str(sess.levelScore)
     elif resp=="GAME_OVER":
         resp+=","+str(sess.levelScore)+","+str(sess.totalScore)

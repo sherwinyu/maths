@@ -57,7 +57,6 @@ $(document).ready(function() {
 												$.ajax({
 													type: 'POST',
 													url: 'pollNextLevel',
-													//success: function(a) { console.log(a) },//console.log(''),//pollNextLevelCallback,
 													success: pollNextLevelCallback,
 													data: {sessionID: sessionID}
 												});
@@ -79,19 +78,20 @@ $(document).ready(function() {
 			return;
 		clearInterval(pollNextLevelInterval); // disable the polling for next level if the level starts
 		curLevel = args[1];
-		curLevelTime = args[2];
-		dbg("set time to: "+curLevelTime);
-		curLevelScore = 0;
+		timeLeftInLevel = args[2];
+		dbg("set time to: "+timeLeftInLevel);
+		levelScore = 0;
+		console.log(levelScore);
 
 		$("#levelField").text("Level: " + curLevel);
-		$("#timerField").text("Timer: " + curLevelTime);
+		$("#timerField").text("Timer: " + timeLeftInLevel);
 		$('#id_answer').removeAttr("disabled");
 		$("#scoreField").text("Score: "+levelScore);
 		// start timer countdown for next level
 		updateTimerInterval = setInterval(function() {
-									curLevelTime -= 1;
-									$("#timerField").text("Timer: "+curLevelTime);
-									if (curLevelTime <= 0) {
+									timeLeftInLevel -= 1;
+									$("#timerField").text("Timer: "+timeLeftInLevel);
+									if (timeLeftInLevel <= 0) {
 										clearInterval(pollNextQuestionInterval);
 										clearInterval(updateTimerInterval);
 										$('#id_answer').val('');
@@ -118,12 +118,12 @@ $(document).ready(function() {
 	// if 'SUCCESS' --> update the text for next question; update score
 		args = argscsv.split(",");
 		request_status = args[0];
-		console.log(argscsv+" "+args+" "+request_status)
 		if (request_status == 'FAIL')
 			dbg("pollNextQuestionCallback FAIL");
 		else {
 			curQuestion = args[1];
 			dbg("curQuestion= " + curQuestion);
+			$('#id_answer').val('')
 			$("#questionField").text("Question:" + curQuestion);
 		}
 	}
@@ -145,7 +145,7 @@ $(document).ready(function() {
 	}
 	function dbg(str) {
 		txt = $("#debug").text();
-		$("#debug").text(str+"\n"+txt);
+		//$("#debug").text(str+"\n"+txt);
 	}
 
 
