@@ -11,7 +11,7 @@ class MathsGame:
     
     def __init__(self, gameID):
         self.id = gameID
-        self.sessions = []
+        self.sessionIDs = []
         self.nextQuestion = ''
         self.nextAnswer = 0
         self.difficulty = 1
@@ -20,12 +20,12 @@ class MathsGame:
         self.levelStart = None
         
     def addSession(self, sessionID):
-        self.sessions.append(sessionID)
+        self.sessionIDs.append(sessionID)
         
     def nextLevel(self):
         self.level+=1 
         self.levelStart = time.time()
-        for i in self.sessions:
+        for i in self.sessionIDs:
             mathsSessions[i].nextLevel()
         self.computeNextQuestion()
         self.playing = True
@@ -35,17 +35,17 @@ class MathsGame:
         self.levelStart = None
         self.nextQuestion = None
         self.nextAnswer = None
-        for i in self.sessions:
+        for i in self.sessionIDs:
             mathsSessions[i].endLevel()
     
     def computeNextQuestion(self):
         self.nextQuestion, self.nextAnswer = self.createProblem(self.level, self.difficulty)
 
     def isNextLevelReady(self):
-        if(len(self.sessions)<2): 
+        if(len(self.sessionIDs)<2): 
             return False
-        for i in self.sessions:
-            if not (mathsSessions[i].ready):
+        for id in self.sessionIDs:
+            if not (mathsSessions[id].ready):
                 return False
         return True
 

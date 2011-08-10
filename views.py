@@ -82,4 +82,3 @@ def pollNextQuestion(request):
     html = 'SUCCESS,'+game.nextQuestion
     return HttpResponse(html)
 
-
