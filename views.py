@@ -12,18 +12,20 @@ def submitAnswer(request):
     except: id = -1
     if(id==-1):
         return redirect('/play')
-    sess = mathsSessions[id]
-    resp = sess.checkAnswer(ans)
+    
+    session = mathsSessions[id]
+    game = mathsGames[session.gameID]
+    resp = session.checkAnswer(ans)
     if(resp=="WRONG"):
         resp+=","+str(ans)
     elif(resp=="LEVEL_OVER"): 
-        resp+=","+str(sess.levelScore)
+        resp+=","+str(session.levelScore)
     elif resp=="GAME_OVER":
-        resp+=","+str(sess.levelScore)+","+str(sess.totalScore)
+        resp+=","+str(session.levelScore)+","+str(session.totalScore)
     elif resp=="CORRECT":
-        mathsGame.computeNextQuestion()
-        for sessionID in mathsGame.sessions:
-            mathsSessions[sessionID].waitingForQuestion = True
+        game.computeNextQuestion()
+        for sessionID in game.sessions:
+            session.waitingForQuestion = True
     return HttpResponse(resp)
 
 def newSession(request):
@@ -39,11 +41,13 @@ def playerReady(request):
         id = -1 
     if id == -1:
         return redirect('/play')
-    sess = mathsSessions[id]
-    sess.ready = True
-    if mathsGame.isNextLevelReady():
-        mathsGame.nextLevel()
-    return HttpResponse('success!thisisnnotparsed')
+    
+    session = mathsSessions[id]
+    game = mathsGames[session.gameID]
+    session.ready = True
+    if game.isNextLevelReady():
+        game.nextLevel()
+    return HttpResponse('Success')
 
 def pollNextLevel(request):
     if not request.is_ajax() or request.method != 'POST':
@@ -52,9 +56,13 @@ def pollNextLevel(request):
     except: id = -1
     if id == -1:
         return redirect('/play')
-    if not mathsGame.playing:
-        return HttpResponse('FAIL') # TODO json this shit
-    html = "SUCCESS,%d,%d" % (mathsGame.level, levelTimeLimit[mathsGame.level] )
+    
+    session = mathsSessions[id]
+    game = mathsGames[session.gameID]
+    if not game.playing:
+        return HttpResponse('FAIL')
+    
+    html = "SUCCESS,%d,%d" % (game.level, levelTimeLimit[game.level] )
     return HttpResponse(html) 
 
 def pollNextQuestion(request):
@@ -64,11 +72,14 @@ def pollNextQuestion(request):
     except: id = -1
     if id == -1:
         return redirect('/play')
-    if not mathsSessions[id].waitingForQuestion:
+    
+    session = mathsSessions[id]
+    game = mathsGames[session.gameID]
+    if not session.waitingForQuestion:
         return HttpResponse('FAIL')
     
-    mathsSessions[id].waitingForQuestion = False
-    html = 'SUCCESS,'+mathsGame.nextQuestion
+    session.waitingForQuestion = False
+    html = 'SUCCESS,'+game.nextQuestion
     return HttpResponse(html)
 
 

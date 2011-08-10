@@ -3,6 +3,7 @@ import time
 
 mathsSessionCounter = 0
 mathsSessions = {}
+mathsGames = {}
 levelTimeLimit = (-1,5,5,5,10,10)
 totalNumLevels = 5
 
@@ -55,11 +56,11 @@ class MathsGame:
         c = a+b
         return ('%d + %d = ?' % (a,b), c)
 
-mathsGame = MathsGame(0)
 
 class MathsSession:
-    def __init__(self, id):
+    def __init__(self, id, gameID):
         self.id = id
+        self.gameID = gameID
         self.levelScore = 0
         self.totalScore = 0
         self.ready = False
@@ -79,15 +80,17 @@ class MathsSession:
     # If the answer is wrong, returns wrong
     # Otherwise, the answer is correct, so we return correct
     def checkAnswer(self, answer):
-        if mathsGame.levelStart==None or (mathsGame.levelStart + levelTimeLimit[mathsGame.level] < time.time()):
+        game = mathsGames[self.gameID]
+        if game.levelStart==None or \
+            (game.levelStart + levelTimeLimit[game.level] < time.time()):
             if self.ready:
-                mathsGame.endLevel()
-            return "GAME_OVER" if (mathsGame.level==totalNumLevels) else "LEVEL_OVER"
-        if mathsGame.nextAnswer==None:
+                game.endLevel()
+            return "GAME_OVER" if (game.level==totalNumLevels) else "LEVEL_OVER"
+        if game.nextAnswer==None:
             return "NO_QUESTION"
         if answer==None:
             return "INVALID_ANSWER"
-        if answer==mathsGame.nextAnswer: # if user's answer is correct
+        if answer==game.nextAnswer: # if user's answer is correct
             self.levelScore+=1 #TODO change scoring system
             return "CORRECT"
         else:
@@ -103,27 +106,13 @@ def startSession():
     global mathsSessionCounter
     id = mathsSessionCounter
     mathsSessionCounter+=1
-    mathsSessions[id] = MathsSession(id)
-    mathsGame.addSession(id)
+    gameID = id/2
+    if not gameID in mathsGames:
+        mathsGames[gameID] = MathsGame(gameID)
+    mathsSessions[id] = MathsSession(id, gameID)
+    mathsGames[gameID].addSession(id)
     return id
 
 def endSession(id):
     if id in mathsSessions:
         del mathsSessions[id]
-
-
-
-def testStack():
-    id = startSession()
-    sess = mathsSessions[id]
-    for i in range(5):
-        q = sess.nextLevel()
-        while(q!="TIMEOUT"):
-            if q!="WRONG":
-                print q
-            a = random.randint(1, 10**(i+1)*2)
-            q = sess.answer(a)
-        print "Your score for this level: %d" % sess.levelScore
-        sess.endLevel()
-    print "Your total score: %d" % sess.totalScore
-    endSession(id)
