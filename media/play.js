@@ -4,6 +4,7 @@ $(document).ready(function() {
 	glLevelScore = 0;
 	glTotalScore = 0;
 	glCurQuestion = '';
+	glDebugDiv = false;
 	$('#id_answer').attr("disabled", true);
 
 	function submitAnswer() {
@@ -148,11 +149,12 @@ $(document).ready(function() {
 		$('#nextLevelButton').attr("disabled", true);
 	}
 	function dbg(str) {
-		txt = $("#debug").html();
-		$("#debug").html(str+'<br>'+txt);
+		if (glDebugDiv) {
+			txt = $("#debug").html();
+			$("#debug").html(str+'<br>'+txt);
+		}
+		console.log(str);
 	}
-
-
 
 	// Bind button listeners
 	$("#id_answer").keydown(function(event) {
@@ -163,5 +165,5 @@ $(document).ready(function() {
 	$("#nextLevelButton").click(function(event) {
 		playerReady();
 	});
-	
+
 }); // end Docuemnt.Ready
